@@ -17,40 +17,39 @@ int main(int argc, char **argv){ // main
     while((flag=getopt(argc, argv, "ilr:s:")) != -1){
         anyOption=1;
         switch(flag){
-            case 'i': // -i para informação do sistema
+            case 'i':                                   // -i para informação do sistema (informações)
                 information=1;
                 break;
-            case 'l': // -l para listar o diretorio raiz
+            case 'l':                                   // -l para listar o diretorio raiz (listar)
                 listRootDir=1;
                 break;
-            case 'r': // -r para recuperar o arquivo
+            case 'r':                                   // -r para recuperar o arquivo (recuperar)
                 recoverFiles=1;
                 recOptarg = optarg;
                 break;
-            case 's': // -s para recuperar um arquivo com SHA
+            case 's':                                   // -s para recuperar um arquivo com SHA
                 sha = 1;
                 shaOptarg = optarg;
                 break;
-            default:
+            default:                                    // outro comando errado ou nenhum comando digitado
                 showUsage();
                 break;
         }
     }
 
-    if (anyOption==0 || optind==argc) // instrução
+    if (anyOption==0 || optind==argc)                   // instrução
         showUsage();
-
-    // pega informação do sistema de arquivos
-    int fd = getFileDirectory(argv[optind]);
-    BootEntry* disk = readFileSystem(fd);
-
+                                     
+    int fd = getFileDirectory(argv[optind]);            // pega informação do sistema de arquivos
+    BootEntry* disk = readFileSystem(fd);               // mapeia o disco na struct
+    // Envia para a função, dependendo da qual foi escolhida
     if (information)
         showDiskInformation(disk);
     else if (listRootDir)
         getRootDirectoryEntries(fd, disk);
-    else if(sha){ // so usa SHA quando -r estiver
+    else if(sha){                                       // recuperar com SHA
         if(recoverFiles){
-            if (recOptarg == NULL)
+            if (recOptarg == NULL)                      // so usa SHA quando -r estiver
             showUsage();
         recoverFile(fd, disk, recOptarg, shaOptarg);
         }
@@ -58,7 +57,7 @@ int main(int argc, char **argv){ // main
             showUsage();
         }
     }
-    else if(recoverFiles && !sha){ //recuperar sem SHA
+    else if(recoverFiles && !sha){                      //recuperar sem SHA
         if (recOptarg == NULL)
             showUsage();
         recoverFile(fd, disk, recOptarg, NULL);
